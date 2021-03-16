@@ -1,3 +1,5 @@
+<p align="center"><img src="https://raw.githubusercontent.com/dragosh635/birthdays/master/public/img/AppHome.png" width="800"></p>
+
 <p align="center"><img src="https://raw.githubusercontent.com/dragosh635/birthdays/master/public/img/AppPrint.png" width="800"></p>
 
 ## About Laravel
