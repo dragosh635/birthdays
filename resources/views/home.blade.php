@@ -71,7 +71,7 @@
 
 
     <!-- Header -->
-    <header class="header text-center text-white" style="background-image: linear-gradient(-225deg, #5D9FFF 0%, #B8DCFF 48%, #6BBBFF 100%);">
+    <header class="header text-center text-white" style="background-image: linear-gradient(-225deg, #5D9FFF 0%, #B8DCFF 48%, #6BBBFF 100%); padding: 100px 0 45px">
         <div class="container">
 
             <div class="row">
@@ -98,14 +98,14 @@
                     <div class="col-md-10 col-xl-9 mx-auto">
 
                         @foreach($celebrated as $user)
-                            <div class="card hover-shadow-7 my-8">
+                            <div class="card hover-shadow-7 my-4">
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-2">
                                         <a href="blog-single.html"><img class="fit-cover position-absolute h-100" src="{{asset('storage/users/' . $user->picture)}}" alt="..."></a>
                                     </div>
 
-                                    <div class="col-md-8">
-                                        <div class="p-7">
+                                    <div class="col-md-10">
+                                        <div class="p-2">
                                             <h4>{{ $user->fullName }}</h4>
                                             <p>{{ $user->age }} {{ Str::plural('year', $user->age) }} old</p>
                                         </div>
