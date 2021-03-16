@@ -2,24 +2,40 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserCreateRequest;
+use App\Http\Requests\UserEditRequest;
+use App\Notifications\BirthdayToday;
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * UserController constructor.
      */
-    public function index()
+    public function __construct()
     {
-        //
+        $this->middleware('auth');
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Display the list of contacts for the authenticated user
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
+    public function index()
+    {
+        $contacts = auth()->user()->contacts;
+
+        return view('users.index', compact('contacts'));
+    }
+
+    /**
+     * Show the form for creating a new user.
+     *
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function create()
     {
@@ -27,27 +43,27 @@ class UserController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Save a new user
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  UserCreateRequest  $request
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request)
+    public function store(UserCreateRequest $request)
     {
-        //
-    }
+        // upload the image
+        $image = $request->image->store('users');
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
+        $new = auth()->user()->contacts()->create([
+            'first_name' => $request->first_name,
+            'last_name'  => $request->last_name,
+            'email'      => $request->email,
+            'birthday'   => $request->birthday,
+            'password'   => Hash::make($request->password),
+            'picture'    => $image,
+        ]);
+
+        return redirect()->route('users.index')->with('success', $new->fullName.' was created');
     }
 
     /**
@@ -57,33 +73,49 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(User $user)
     {
-        //
+        return view('users.edit', compact('user'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the user
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  UserEditRequest  $request
+     * @param  User  $user
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, $id)
+    public function update(UserEditRequest $request, User $user)
     {
-        //
+        // upload the image
+        $request->image->store('public/users');
+
+        $user->update([
+            'first_name' => $request->first_name,
+            'last_name'  => $request->last_name,
+            'email'      => $request->email,
+            'birthday'   => $request->birthday,
+            'password'   => Hash::make($request->password),
+            'picture'    => $request->image->hashName(),
+        ]);
+
+        return redirect()->route('users.index')->with('success', $user->fullName.' was updated');
     }
 
+
     /**
-     * Remove the specified resource from storage.
+     * Delete user
      *
-     * @param  int  $id
+     * @param  User  $user
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
      */
-    public function destroy($id)
+    public function destroy(User $user)
     {
-        //
+        $user->delete();
+
+        return redirect()->route('users.index')->with('success', $user->fullName.' was deleted');
     }
 }
